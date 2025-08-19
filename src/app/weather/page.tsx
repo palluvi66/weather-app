@@ -9,19 +9,22 @@ import { useEffect, useState } from 'react';
 // import rain from '@/assets/rainy.jpg';
 
 
-export default function WeatherApp() {
-  type Weather = {
-    name: string;
-    localtime: string;
-    country: string;
-    condition: any;
-    wind_kph: number;
-    humidity: number;
-    current: {
-      temp_c: number;
-    };
-  } | null;
 
+type Weather = {
+  name: string;
+  localtime: string;
+  country: string;
+  condition: {
+    text: string;
+    icon: string;
+  };
+  wind_kph: number;
+  humidity: number;
+  current: {
+    temp_c: number;
+  };
+} | null;
+export default function WeatherApp() {
   const [weather, setWeather] = useState<Weather>(null);
   const [query, setQuery] = useState('India');
   const [searchTerm, setSearchTerm] = useState('');
@@ -98,8 +101,8 @@ export default function WeatherApp() {
       if (conditionLower.includes('sleet') || conditionLower.includes('patchy sleet') || conditionLower.includes('light sleet') || conditionLower.includes('heavy sleet') || conditionLower.includes('moderate or heavy sleet'))
         return "/assets/heavy-sleet.jpg";
 
-        if (conditionLower.includes('partly cloudy'))
-          return "/assets/partlycloudybg.jpg";
+      if (conditionLower.includes('partly cloudy'))
+        return "/assets/partlycloudybg.jpg";
       if (conditionLower.includes('overcast'))
         return "/assets/patchy.jpg";
 
@@ -116,7 +119,7 @@ export default function WeatherApp() {
       if (conditionLower.includes('snow') || conditionLower.includes('sleet') || conditionLower.includes('light snow') || conditionLower.includes('heavy snow') || conditionLower.includes('patchy light snow') || conditionLower.includes('patchy heavy snow') || conditionLower.includes('moderate or heavy snow'))
         return "/assets/snow.jpg";
 
-      
+
       if (conditionLower.includes('mist'))
         return "/assets/mist.jpg";
 
@@ -150,7 +153,7 @@ export default function WeatherApp() {
   </div> */}
 
       <div className=" items-center  bg-transparent  flex-col justify-center rounded-lg flex ">
-      <h1 className='text-4xl sm:text-5xl md:text-5xl lg:text-5x -mt-22 lg:-mt-10 mb-2 font-bold text-cyan-900 italic'>Weather</h1>
+        <h1 className='text-4xl sm:text-5xl md:text-5xl lg:text-5x -mt-22 lg:-mt-10 mb-2 font-bold text-cyan-900 italic'>Weather</h1>
         <form className='flex  border-gray-500 sm:mt-18 md:mt-10 overflow-hidden items-center bg-blue-100 rounded-full px-2 md:px-4 md:py-5 py-2 border lg:py-3 lg:px-4
         w-[250px] sm:w-[580px] md:w-[500px] lg:w-[400px]' onSubmit={handleSearch}>
           <input
