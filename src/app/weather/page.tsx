@@ -2,13 +2,21 @@
 import { IoSearch } from "react-icons/io5";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { useEffect, useState } from 'react';
-// import Image from 'next/image';
-// import sunnybg from '@/assets/sunny.jpg';
-// import mist from '@/assets/mist.jpg'; 
-// import cloudybg from '@/assets/cloudy.jpg';
-// import rain from '@/assets/rainy.jpg';
+import Image from 'next/image';
+import type { StaticImageData } from "next/image";
 
-
+// Assets
+import sunnybg from '@/assets/sunnybg.jpg';
+import mist from '@/assets/mist.jpg';
+import cloudybg from '@/assets/cloudy.jpg';
+import rain from '@/assets/rain.jpg';
+import heavy from '@/assets/heavy-sleet.jpg';
+import lightrain from '@/assets/lightrain.jpg';
+import nightclear from '@/assets/night-clearbg.avif';
+import partlycloudy from '@/assets/partlycloudybg.jpg';
+import patchy from '@/assets/patchy.jpg';
+import rainwiththunderstorm from '@/assets/rainwiththunderstorm.jpg';
+import snow from '@/assets/snow.jpg';
 
 type Weather = {
   name: string;
@@ -24,6 +32,7 @@ type Weather = {
     temp_c: number;
   };
 } | null;
+
 export default function WeatherApp() {
   const [weather, setWeather] = useState<Weather>(null);
   const [query, setQuery] = useState('India');
@@ -31,15 +40,12 @@ export default function WeatherApp() {
   const [time12, setTime12] = useState("");
   const [dateOnly, setDateOnly] = useState("");
   const [weatherCondition, setWeatherCondition] = useState('sunny');
-  const [bgImage, setBgImage] = useState('');
+  const [bgImage, setBgImage] = useState<string | StaticImageData>(sunnybg);
 
-
-
+  // ✅ Format date/time
   useEffect(() => {
     if (weather?.localtime) {
       const [datePart, timePart] = weather.localtime.split(' ');
-
-      // Format time to 12-hour
       const [hours, minutes] = timePart.split(':');
       const timeDate = new Date();
       timeDate.setHours(Number(hours));
@@ -61,12 +67,16 @@ export default function WeatherApp() {
     }
   }, [weather]);
 
+  // ✅ Fetch weather
   useEffect(() => {
     async function fetchWeatherData(city: string): Promise<void> {
       try {
-        const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=41386656f06d4f06b2a111600251507&q=${city}&aqi=no`);
+        const response = await fetch(
+          `https://api.weatherapi.com/v1/current.json?key=41386656f06d4f06b2a111600251507&q=${city}&aqi=no`
+        );
         const weatherData = await response.json();
-        if (weatherData && weatherData.current && weatherData.location) {
+
+        if (weatherData?.current && weatherData?.location) {
           setWeather({
             name: weatherData.location.name,
             localtime: weatherData.location.localtime,
@@ -74,12 +84,9 @@ export default function WeatherApp() {
             condition: weatherData.current.condition,
             wind_kph: weatherData.current.wind_kph,
             humidity: weatherData.current.humidity,
-            current: {
-              temp_c: weatherData.current.temp_c,
-            },
+            current: { temp_c: weatherData.current.temp_c },
           });
-          setWeatherCondition(weatherData.current.condition.text); // <-- ✅ add this line
-
+          setWeatherCondition(weatherData.current.condition.text);
         } else {
           console.error("Invalid response data:", weatherData);
         }
@@ -90,46 +97,37 @@ export default function WeatherApp() {
     fetchWeatherData(query);
   }, [query]);
 
+  // ✅ Map condition → background
+  function getbgImage(condition: string): string | StaticImageData {
+    const lower = condition.toLowerCase();
+    if (lower.includes("sunny")) return sunnybg;
+    if (lower.includes("clear")) return nightclear;
+    if (lower.includes("sleet")) return heavy;
+    if (lower.includes("partly cloudy")) return partlycloudy;
+    if (lower.includes("overcast")) return patchy;
+    if (lower.includes("cloudy")) return cloudybg;
+    if (
+      lower.includes("light rain shower") ||
+      lower.includes("light drizzle") ||
+      lower.includes("drizzle") ||
+      lower.includes("light rain") ||
+      lower.includes("patchy light rain")
+    )
+      return lightrain;
+    if (lower.includes("thunder")) return rainwiththunderstorm;
+    if (lower.includes("rain")) return rain;
+    if (lower.includes("snow")) return snow;
+    if (lower.includes("mist")) return mist;
+
+    return sunnybg; // fallback
+  }
+
+  // ✅ Update bgImage when condition changes
   useEffect(() => {
-    function getbgImage(condition: string): string {
-      const conditionLower = condition.toLowerCase();
-
-      if (conditionLower.includes('sunny'))
-        return "/assets/sunnybg.jpg";
-      if (conditionLower.includes('clear'))
-        return "/assets/night-clearbg.jpg";
-      if (conditionLower.includes('sleet') || conditionLower.includes('patchy sleet') || conditionLower.includes('light sleet') || conditionLower.includes('heavy sleet') || conditionLower.includes('moderate or heavy sleet'))
-        return "/assets/heavy-sleet.jpg";
-
-      if (conditionLower.includes('partly cloudy'))
-        return "/assets/partlycloudybg.jpg";
-      if (conditionLower.includes('overcast'))
-        return "/assets/patchy.jpg";
-
-      if (conditionLower.includes('patchy rain nearby') || conditionLower.includes('overcast') || conditionLower.includes('cloudy'))
-        return "/assets/cloudy.jpg";
-
-      if (conditionLower.includes('light rain shower') || conditionLower.includes('light rain') || conditionLower.includes('light drizzle') || conditionLower.includes('patchy light rain') || conditionLower.includes('patchy light drizzle') || conditionLower.includes('moderate rain') || conditionLower.includes('drizzle') || conditionLower.includes('light rain at times'))
-        return "/assets/lightrain.jpg";
-      if (conditionLower.includes('rain') || conditionLower.includes('torrential rain shower') || conditionLower.includes('heavy rain') || conditionLower.includes('heavy rain at times') || conditionLower.includes('moderate rain at times') || conditionLower.includes('moderate or heavy rain shower') || conditionLower.includes('moderate or heavy rain') || conditionLower.includes('heavy rain shower'))
-        return "/assets/rain.jpg";
-
-      if (conditionLower.includes('patchy light rain with thunder') || conditionLower.includes('light rain with thunder') || conditionLower.includes('moderate or heavy rain with thunder') || conditionLower.includes('heavy rain with thunder') || conditionLower.includes('torrential rain shower with thunder') || conditionLower.includes('moderate or heavy rain shower with thunder'))
-        return "/assets/rainwiththunderstorm.jpg";
-      if (conditionLower.includes('snow') || conditionLower.includes('sleet') || conditionLower.includes('light snow') || conditionLower.includes('heavy snow') || conditionLower.includes('patchy light snow') || conditionLower.includes('patchy heavy snow') || conditionLower.includes('moderate or heavy snow'))
-        return "/assets/snow.jpg";
-
-
-      if (conditionLower.includes('mist'))
-        return "/assets/mist.jpg";
-
-      return "/assets/sunnybg.jpg";
-    }
-
-
-    setBgImage(getbgImage(weatherCondition))
+    setBgImage(getbgImage(weatherCondition));
   }, [weatherCondition]);
 
+  // ✅ Search handler
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchTerm.trim() !== '') {
@@ -137,63 +135,86 @@ export default function WeatherApp() {
       setSearchTerm('');
     }
   };
+
   return (
-    <div
-      className="min-h-screen flex items-center justify-center"
-      style={{
-        backgroundImage: `url(${bgImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
+    <div className="min-h-screen flex items-center justify-center relative">
+      {/* Background Image */}
+      <Image
+        src={bgImage}
+        alt="Background"
+        fill
+        className="object-cover -z-10"
+        priority
+      />
 
-      {/* <div className="absolute   w-full h-full -z-10">
-    <CarouselComponent />
-  </div> */}
+      {/* Content */}
+      <div className="items-center bg-transparent flex-col justify-center rounded-lg flex">
+        <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-5xl mb-2 font-bold text-cyan-900">
+          Weather
+        </h1>
 
-      <div className=" items-center  bg-transparent  flex-col justify-center rounded-lg flex ">
-        <h1 className='text-4xl sm:text-5xl md:text-5xl lg:text-5x -mt-22 lg:-mt-10 mb-2 font-bold text-cyan-900 italic'>Weather</h1>
-        <form className='flex  border-gray-500 sm:mt-18 md:mt-10 overflow-hidden items-center bg-blue-100 rounded-full px-2 md:px-4 md:py-5 py-2 border lg:py-3 lg:px-4
-        w-[250px] sm:w-[580px] md:w-[500px] lg:w-[400px]' onSubmit={handleSearch}>
+        {/* Search */}
+        <form
+          className="flex border-gray-500 mt-6 overflow-hidden items-center bg-blue-100 rounded-full px-4 py-2 border
+          w-[250px] sm:w-[580px] md:w-[500px] lg:w-[400px]"
+          onSubmit={handleSearch}
+        >
           <input
             type="text"
             placeholder="Search city..."
-            className="flex-grow bg-transparent  outline-none text-cyan-900"
+            className="flex-grow bg-transparent outline-none text-cyan-900"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button type="submit" className="">
+          <button type="submit">
             <IoSearch className="text-lg" />
           </button>
         </form>
+
+        {/* Weather Info */}
         {weather && (
-          <div className='text-center mt-4 lg:mt-10 items-center justify-center '>
-            <h2 className='text-3xl sm:text-4xl md:text-4xl lg:text-4xl font-bold text-cyan-900 '>{weather.name}, {weather.country}</h2>
-            <div className="flex flex-row gap-6 justify-center">
-              <p className=' text-lg -mb-2 sm:text-xl md:text-2xl lg:text-2xl flex items-center justify-center font-bold text-cyan-900'>
+          <div className="text-center mt-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-cyan-900">
+              {weather.name}, {weather.country}
+            </h2>
+
+            <div className="flex flex-row gap-6 justify-center mt-2">
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-cyan-900">
                 {time12}
               </p>
-              <p className=' text-xl sm:text-3xl md:text-2xl lg:text-3xl gap-2 flex items-center justify-center font-bold text-cyan-900'>
+              <p className="text-xl sm:text-2xl flex items-center gap-2 font-bold text-cyan-900">
                 <FaRegCalendarAlt className="text-cyan-900" />
                 {dateOnly}
               </p>
             </div>
-            <div className='space-x-2 flex items-center justify-center mr-8'>
-              <img src={weather.condition.icon} alt={weather.condition.text} className='w-35 h-35' />
-              <div className="flex flex-col mt-6 items-center">
-                <p className='text-xl sm:text-3xl md:text-3xl lg:text-3xl font-bold text-cyan-900'>{weather.current.temp_c} °C</p>
-                <p className='text-xl sm:text-3xl md:text-3xl lg:text-3xl font-bold text-cyan-900 mt-2'>{weather.condition.text}</p>
+
+            <div className="flex items-center justify-center mt-6 gap-4">
+              <img
+                src={weather.condition.icon}
+                alt={weather.condition.text}
+                className="w-20 h-20"
+              />
+              <div>
+                <p className="text-2xl font-bold text-cyan-900">
+                  {weather.current.temp_c} °C
+                </p>
+                <p className="text-xl font-bold text-cyan-900 mt-1">
+                  {weather.condition.text}
+                </p>
               </div>
             </div>
-            <div className="flex gap-4  items-center  justify-center">
-              <p className='mt-2 text-xl sm:text-3xl md:text-3xl lg:text-3xl font-bold text-cyan-900 '>Wind:{weather.wind_kph}kph</p>
-              <p className='mt-2 text-xl sm:text-3xl md:text-3xl lg:text-3xl font-bold md:font-bold text-cyan-900 '>Humidity:{weather.humidity}%</p>
+
+            <div className="flex gap-10 justify-center mt-6">
+              <p className="text-xl sm:text-2xl font-bold text-cyan-900">
+                Wind: {weather.wind_kph} kph
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-cyan-900">
+                Humidity: {weather.humidity}%
+              </p>
             </div>
           </div>
         )}
       </div>
     </div>
-
   );
 }
