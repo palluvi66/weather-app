@@ -17,6 +17,9 @@ import partlycloudy from '@/assets/partlycloudybg.jpg';
 import patchy from '@/assets/patchy.jpg';
 import rainwiththunderstorm from '@/assets/rainwiththunderstorm.jpg';
 import snow from '@/assets/snow.jpg';
+import fog from '@/assets/foggy-weather.webp';
+import icepellets from '@/assets/ice-pellets.jpg';
+import snowwiththunder from '@/assets/snowwiththunder.jpg';
 
 type Weather = {
   name: string;
@@ -100,25 +103,93 @@ export default function WeatherApp() {
   // ✅ Map condition → background
   function getbgImage(condition: string): string | StaticImageData {
     const lower = condition.toLowerCase();
-    if (lower.includes("sunny")) return sunnybg;
-    if (lower.includes("clear")) return nightclear;
-    if (lower.includes("sleet")) return heavy;
-    if (lower.includes("partly cloudy")) return partlycloudy;
-    if (lower.includes("overcast")) return patchy;
-    if (lower.includes("cloudy")) return cloudybg;
+    if (lower.includes("Sunny")) return sunnybg;
+    if (lower.includes("Clear")) return nightclear;
     if (
-      lower.includes("light rain shower") ||
-      lower.includes("light drizzle") ||
-      lower.includes("drizzle") ||
-      lower.includes("light rain") ||
-      lower.includes("patchy light rain")
+      lower.includes("Sleet") ||
+      lower.includes("Heavy sleet") ||
+      lower.includes("Light sleet") ||
+      lower.includes("Freezing rain") ||
+      lower.includes("Freezing drizzle") ||
+      lower.includes("Heavy freezing drizzle") ||
+      lower.includes("Patchy moderate snow possible") ||
+      lower.includes("Patchy sleet possible") ||
+      lower.includes("Light sleet showers") ||
+      lower.includes("Moderate or heavy sleet")
     )
-      return lightrain;
-    if (lower.includes("thunder")) return rainwiththunderstorm;
-    if (lower.includes("rain")) return rain;
-    if (lower.includes("snow")) return snow;
-    if (lower.includes("mist")) return mist;
+      return heavy;
+    if (lower.includes("Partly cloudy") ||
+      lower.includes("Patchy rain possible") ||
+      lower.includes("Patchy light rain") ||
 
+      lower.includes("Heavy rain shower")
+    ) return partlycloudy;
+    if (lower.includes("Overcast")) return patchy;
+    if (lower.includes("Cloudy")) return cloudybg;
+    if (
+      lower.includes("Light rain shower") ||
+      lower.includes("Patchy freezing drizzle possible") ||
+      lower.includes("Patchy light rain") ||
+      lower.includes("Light freezing rain possible") ||
+      lower.includes("Moderate or heavy freezing rain") ||
+      lower.includes("Patchy light drizzle") ||
+      lower.includes("Light drizzle") ||
+      lower.includes("Heavy drizzle") ||
+      lower.includes("Drizzle") ||
+      lower.includes("Moderate rain at times") ||
+      lower.includes("Heavy freezing drizzle") ||
+      lower.includes("Light rain shower") ||
+      lower.includes("Moderate or heavy rain shower") ||
+      lower.includes("Torrential rain shower") ||
+      lower.includes("Freezing drizzle")
+    ) return lightrain;
+    if (lower.includes("Thunder") ||
+      lower.includes("Thunderstorm") ||
+      lower.includes("Light thunderstorm") ||
+      lower.includes("Patchy light rain with thunder") ||
+      lower.includes("Moderate or heavy rain with thunder") ||
+
+      lower.includes("Heavy thunderstorm")
+    ) return rainwiththunderstorm;
+    if (lower.includes("Rain") ||
+      lower.includes("Heavy rain") ||
+      lower.includes("Heavy rain at times") ||
+
+      lower.includes("Moderate rain") ||
+      lower.includes("Moderate rain") ||
+      lower.includes("Moderate rain at times") ||
+      lower.includes("Light rain")
+    ) return rain;
+    if (lower.includes("Snow") ||
+      lower.includes("Patchy snow possible") ||
+      lower.includes("Moderate snow") ||
+      lower.includes("Blowing snow") ||
+      lower.includes("Light snow showers") ||
+      lower.includes("Moderate snow showers") ||
+      lower.includes("Heavy snow showers") ||
+      lower.includes("Moderate or heavy snow showers") ||
+      lower.includes("Blizzard") ||
+      lower.includes("Patchy light snow") ||
+      lower.includes("Light snow") ||
+      lower.includes("Patchy heavy snow") ||
+      lower.includes("Heavy snow")
+    )
+      return snow;
+    if (lower.includes("Mist")) return mist;
+    if (lower.includes("Fog") ||
+      lower.includes("Freezing fog")
+    )
+      return fog;
+    if (lower.includes("Ice pellets") ||
+      lower.includes("Light showers of ice pellets") ||
+      lower.includes("Moderate or heavy showers of ice pellets") ||
+      lower.includes("Patchy heavy snow") ||
+      lower.includes("Heavy snow"))
+      return icepellets;
+    if (lower.includes("Patchy light snow with thunder") ||
+      lower.includes("Moderate or heavy snow with thunder")
+    )
+      return snowwiththunder;
     return sunnybg; // fallback
   }
 
