@@ -121,8 +121,8 @@ export default function WeatherApp() {
     if (lower.includes("partly cloudy") ||
       lower.includes("patchy rain possible") ||
       lower.includes("patchy light rain") ||
-
-      lower.includes("heavy rain shower")
+      lower.includes("patchy light rain") ||
+      lower.includes("patchy rain nearby")
     ) return partlycloudy;
     if (lower.includes("overcast")) return patchy;
     if (lower.includes("cloudy")) return cloudybg;
