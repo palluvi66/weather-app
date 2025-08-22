@@ -118,14 +118,20 @@ export default function WeatherApp() {
       lower.includes("moderate or heavy sleet")
     )
       return heavy;
-    if (lower.includes("partly cloudy") ||
-      lower.includes("patchy rain possible") ||
+    if (
       lower.includes("patchy light rain") ||
-      lower.includes("patchy light rain") ||
+      lower.includes("patchy light rain")
+    )
+      return partlycloudy;
+    if (lower.includes("overcast") ||
       lower.includes("patchy rain nearby")
-    ) return partlycloudy;
-    if (lower.includes("overcast")) return patchy;
-    if (lower.includes("cloudy")) return cloudybg;
+    )
+      return patchy;
+    if (lower.includes("cloudy") ||
+      lower.includes("patchy rain possible") ||
+      lower.includes("partly cloudy") ||
+    )
+      return cloudybg;
     if (
       lower.includes("light rain shower") ||
       lower.includes("patchy freezing drizzle possible") ||
