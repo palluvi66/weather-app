@@ -4,6 +4,7 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import type { StaticImageData } from "next/image";
+import { unstable_ViewTransition as ViewTransition } from 'react'
 
 // Assets
 import sunnybg from '@/assets/sunnybg.jpg';
@@ -15,11 +16,12 @@ import lightrain from '@/assets/lightrain.jpg';
 import nightclear from '@/assets/night-clearbg.avif';
 import partlycloudy from '@/assets/partlycloudybg.jpg';
 import patchy from '@/assets/patchy.jpg';
-import rainwiththunderstorm from '@/assets/rainwiththunderstorm.jpg';
+import rainwiththunderstorm from '@/assets/heavyrain&thunderstorm.jpg';
 import snow from '@/assets/snow.jpg';
 import fog from '@/assets/foggy-weather.webp';
 import icepellets from '@/assets/ice-pellets.jpg';
 import snowwiththunder from '@/assets/snowwiththunder.jpg';
+import thunder from '@/assets/thunder.jpg';
 
 type Weather = {
   name: string;
@@ -80,15 +82,33 @@ export default function WeatherApp() {
         const weatherData = await response.json();
 
         if (weatherData?.current && weatherData?.location) {
-          setWeather({
-            name: weatherData.location.name,
-            localtime: weatherData.location.localtime,
-            country: weatherData.location.country,
-            condition: weatherData.current.condition,
-            wind_kph: weatherData.current.wind_kph,
-            humidity: weatherData.current.humidity,
-            current: { temp_c: weatherData.current.temp_c },
-          });
+          if (document.startViewTransition) {
+            document.startViewTransition(() => {
+              setWeather({
+                name: weatherData.location.name,
+                localtime: weatherData.location.localtime,
+                country: weatherData.location.country,
+                condition: weatherData.current.condition,
+                wind_kph: weatherData.current.wind_kph,
+                humidity: weatherData.current.humidity,
+                current: { temp_c: weatherData.current.temp_c },
+              });
+              setWeatherCondition(weatherData.current.condition.text);
+            });
+          } else {
+            // Fallback
+            setWeather({
+              name: weatherData.location.name,
+              localtime: weatherData.location.localtime,
+              country: weatherData.location.country,
+              condition: weatherData.current.condition,
+              wind_kph: weatherData.current.wind_kph,
+              humidity: weatherData.current.humidity,
+              current: { temp_c: weatherData.current.temp_c },
+            });
+            setWeatherCondition(weatherData.current.condition.text);
+          }
+
           setWeatherCondition(weatherData.current.condition.text);
         } else {
           console.error("Invalid response data:", weatherData);
@@ -120,16 +140,17 @@ export default function WeatherApp() {
       return heavy;
     if (
       lower.includes("patchy light rain") ||
-      lower.includes("patchy light rain")
+      lower.includes("patchy light rain") ||
+      lower.includes("partly cloudy")
     )
       return partlycloudy;
     if (lower.includes("overcast") ||
       lower.includes("patchy rain nearby")
+
     )
       return patchy;
     if (lower.includes("cloudy") ||
-      lower.includes("patchy rain possible") ||
-      lower.includes("partly cloudy") ||
+      lower.includes("patchy rain possible")
     )
       return cloudybg;
     if (
@@ -149,17 +170,23 @@ export default function WeatherApp() {
       lower.includes("torrential rain shower") ||
       lower.includes("freezing drizzle")
     ) return lightrain;
+
+    if (lower.includes("heavy rain with thunderstorm") ||
+      lower.includes("light rain with thunderstorm") ||
+      lower.includes("patchy rain with thunderstorm") ||
+      lower.includes("moderate or heavy rain with thunder") ||
+      lower.includes("torrential rain shower with thunder")
+    ) return rainwiththunderstorm;
+
     if (lower.includes("thunder") ||
       lower.includes("thunderstorm") ||
       lower.includes("light thunderstorm") ||
-      lower.includes("patchy light rain with thunder") ||
-
       lower.includes("heavy thunderstorm")
-    ) return rainwiththunderstorm;
+    ) return thunder;
+
     if (lower.includes("rain") ||
       lower.includes("heavy rain") ||
       lower.includes("heavy rain at times") ||
-
       lower.includes("moderate rain") ||
       lower.includes("moderate rain") ||
       lower.includes("moderate rain at times") ||
@@ -216,16 +243,19 @@ export default function WeatherApp() {
   return (
     <div className="min-h-screen flex items-center justify-center relative">
       {/* Background Image */}
-      <Image
-        src={bgImage}
-        alt="Background"
-        fill
-        className="object-cover -z-10"
-        priority
-      />
+      <div className="absolute inset-0 z-0">
+        <Image
+          key={typeof bgImage === "string" ? bgImage : bgImage.src}
+          src={bgImage}
+          alt="Background"
+          fill
+          className="object-cover  opacity-0 animate-fadeIn"
+          priority
+        />
+      </div>
 
       {/* Content */}
-      <div className="items-center bg-transparent flex-col justify-center rounded-lg flex">
+      <div className="relative z-10 items-center bg-transparent flex-col justify-center rounded-lg flex">
         <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-5xl mb-2 font-bold text-cyan-900">
           Weather
         </h1>
